@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Css.css">
+    <title>Biblioteca</title>
+
+
+</head>
+<body>
+    <h1>Busca de Livros</h1>
+    <label for="searchInput">Digite o título ou autor do livro:</label>
+    <input type="text" id="searchInput">
+    <button onclick="searchBooks()">Buscar</button>
+    <div id="results"></div>
+
+
+    <script>
+        async function searchBooks() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const apiUrl = `https://www.googleapis.com/books/v1/volumes?q=${searchTerm}`;
+
+
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+
+                const resultsDiv = document.getElementById('results');
+                resultsDiv.innerHTML = '';
+
+
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach(item => {
+                        const bookInfo = item.volumeInfo;
+                        const title = bookInfo.title;
+                        const authors = bookInfo.authors ? bookInfo.authors.join(', ') : 'Autor desconhecido';
+                        const thumbnail = bookInfo.imageLinks ? bookInfo.imageLinks.thumbnail : 'https://via.placeholder.com/150';
+
+
+                        const bookDiv = document.createElement('div');
+                        bookDiv.classList.add('book');
+                        bookDiv.innerHTML = `
+                            <img src="${thumbnail}" alt="Capa do livro">
+                            <p><strong>Título:</strong> ${title}</p>
+                            <p><strong>Autor(es):</strong> ${authors}</p>
+                        `;
+                        resultsDiv.appendChild(bookDiv);
+                    });
+                } else {
+                    resultsDiv.textContent = 'Nenhum livro encontrado.';
+                }
+            } catch (error) {
+                console.error('Erro ao obter dados:', error);
+            }
+        }
+    </script>
+</body>
+</html>
